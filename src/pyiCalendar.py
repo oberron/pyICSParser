@@ -19,21 +19,21 @@ Usage
 -----
 * Enumerator of iCalendar file::
 
-    mycal = icalendar.ics()
-    mycal.local_load(icsfile)
-    dates = mycal.get_event_instances(start,end)
-    #dates will contain the json with all explicit dates of the events spec'ed by the iCalendar file
+    mycal = icalendar.ics()\n
+    mycal.local_load(icsfile)\n
+    dates = mycal.get_event_instances(start,end)\n
+    #dates will contain the json with all explicit dates of the events spec'ed by the iCalendar file\n
 
 * Validator::
 
     mycal = icalendar.ics()\n
     perfect = mycal.isCalendarFileCompliant(icsfile) \n
     #When the file does not show any deviance from RFC5545, perfect will hold True \n
-    #Console will display all non-conformance per lines
+    #Console will display all non-conformance per lines\n
 
 To come
 -------
-* 0.6.1z: add load DATE and DATE-TIME 
+* 0.6.3: add load DATE and DATE-TIME 
     + document the code
     + add unittest support for parser, validator (RFC5545_xxx: those from RFC5545, SCM5545_xxx = additional test vectors)
     + add validator for generator + add call for validator from vevent 
@@ -45,15 +45,14 @@ To come
     + add code for instances to have date-time if ics is in datetime
     + reset parameters when reloading
     + unit code on wild calendars : test the line for the errors
-* 0.6.2a: 
     +add code for event_instances (including support for overlapping), 
     get_instances(perday,permonth,peryear) event.instances.isbounded, event.instances.walk,
     +add code for valarm (note about: valarm description not to be counted as event description: cf SO_14892422.ics)
     +add code for multiple rrule, exrule, add code for event_instances['day']
-* 0.6.2b: add code for property parameters, property values, delimiters (linear, wlsp), ENCODING, character sets, language, binary values,XAPIA’s CSA RRULE,
-    x-components and x-properties parsing + for x-properties adding the type of data
-* 0.6.2c: add code for x-components and x-properties generation
-* 0.6.2d: add loader and generator for vtimezone,todo, alarm
+    +add code for property parameters, property values, delimiters (linear, wlsp), ENCODING, character sets, language, binary values,XAPIA’s CSA RRULE,
+    +x-components and x-properties parsing + for x-properties adding the type of data
+* 0.6.4: add code for x-components and x-properties generation
+* 0.6.5: add loader and generator for vtimezone,todo, alarm
 * 0.7.x: add datetime and tzinfo + add email parser / generator capability (read MIME from email, send invite to GCal, Outlook, IPhone, BB)
 * 0.8.x: add support for non-standard compliance: no tzoneinfo, escaped characters, ...
 * 0.9.x: Extend support to new x-properties for iCalendar like events related to religious dates or celestial events
@@ -598,7 +597,7 @@ class iCalendar:
 
 
     """
-    version = "0.6.1y5"
+    version = "0.6.2a4"
     OccurencesWindowStartDate = ""
     """ Date from which occurences of iCalendar events should be returned by the enumerator"""
     OccurencesWindowEndDate = ""
