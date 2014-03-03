@@ -597,7 +597,7 @@ class iCalendar:
 
 
     """
-    version = "0.6.2a4"
+    version = "0.6.2a5"
     OccurencesWindowStartDate = ""
     """ Date from which occurences of iCalendar events should be returned by the enumerator"""
     OccurencesWindowEndDate = ""
