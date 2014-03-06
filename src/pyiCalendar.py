@@ -82,6 +82,8 @@ from icalendar_SCM import RFC5545_SCM, ESCAPEDCHAR,RFC5545_Properties,RFC5545_FR
 from RFC5546_SCM import RFC5546_METHODS
 import uuid
 
+__VERSION__ = "0.6.2a6"
+
 class newTZinfo(tzinfo):
     
     """ Overrides abstract class tzinfo from datetime to provide mean for TZID support from ical
@@ -597,7 +599,7 @@ class iCalendar:
 
 
     """
-    version = "0.6.2a5"
+    version = __VERSION__
     OccurencesWindowStartDate = ""
     """ Date from which occurences of iCalendar events should be returned by the enumerator"""
     OccurencesWindowEndDate = ""
@@ -831,11 +833,11 @@ class iCalendar:
         VCALENDAR_Components = {"VEVENT","VTIMEZONE","VTODO","VFREEBUSY","VJOURNAL"}
         Component_Name = ""
         Component_Stack =[]
-        print "temp 835 - entering parse loaded"
-        import sys,traceback
-        for thread, frame in sys._current_frames().items():
-            print('Thread 0x%x' % thread)
-            traceback.print_stack(frame)
+#         print "temp 835 - entering parse loaded"
+#         import sys,traceback
+#         for thread, frame in sys._current_frames().items():
+#             print('Thread 0x%x' % thread)
+#             traceback.print_stack(frame)
 
         self._log("\t\tentering loader",[])
         invevent = 0
