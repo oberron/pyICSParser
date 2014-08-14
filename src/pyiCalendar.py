@@ -30,6 +30,14 @@ Usage
     perfect = mycal.isCalendarFileCompliant(icsfile) \n
     #When the file does not show any deviance from RFC5545, perfect will hold True \n
     #Console will display all non-conformance per lines\n
+    
+* Generator::
+    calGen = pyiCalendar.iCalendar() \n
+    listDates = [datetime.datetime(2014,8,1),datetime.datetime(2014,9,9),datetime.datetime(2014,10,8)] \n
+    calGen.events=[{"DESCRIPTION":"pyICSParser Generator test event","RDATE":listDates}] \n
+    sICalendar = calGen.Gen_iCalendar() \n
+    print sICalendar \n
+
 
 To come
 -------
@@ -69,6 +77,7 @@ Created on Aug 4, 2011
 * 0.6.1y3 - ValidateiCalendar will report and return True if iCalendar file is 100% compliant
 *0.6.1y4 - fixed the validator not catching the max component count (see RFC5545_eventprop_count) 
             fixed the parser making difference between properties based on casing (lower / upper / mix)
+*0.6.2a8 - fixed issues with the generator (no UID) + added support for Generator with RDATE (added datelist_write)
 @author: oberron
 @change: to 0.4 - passes all unit test in ical_test v0.1
 @change: 0.4 to 0.5 adds EXDATE support
@@ -78,11 +87,12 @@ Created on Aug 4, 2011
 
 from datetime import tzinfo, timedelta, datetime, date
 
-from icalendar_SCM import RFC5545_SCM, ESCAPEDCHAR,RFC5545_Properties,RFC5545_FREQ,weekday_map,MaxInteger, CRLF,RFC5545_eventprop_count
+from icalendar_SCM import RFC5545_SCM, ESCAPEDCHAR,COMMA,RFC5545_Properties,RFC5545_FREQ,weekday_map,MaxInteger, CRLF,RFC5545_eventprop_count
 from RFC5546_SCM import RFC5546_METHODS
 import uuid
+import logging
 
-__VERSION__ = "0.6.2a6"
+__VERSION__ = "0.6.2a8"
 
 class newTZinfo(tzinfo):
     
@@ -348,8 +358,18 @@ class vevent:
         if (pos)>0:
             tdelta += timedelta(seconds = sign*int(time[:pos]))
         return [years,months,tdelta]  
-    def datelist_write(self,dtlist):
-        return  dtlist
+    def datelist_write(self,dtlist2w):
+        """ takes a list of date or datetime and returns a string compatible with icalendar """
+        #FIXME: does not check that all elements in the list are the same type, assumes all are the same as first one
+        dt = datetime(year=2013,month=1,day=26)
+        dtlist =""
+        if type(dt)==type(dtlist2w[0]):
+            for date2w in dtlist2w:
+                dtlist += self.string_write(date2w.strftime("%Y%m%dT%H%M%S").upper())+COMMA
+        else :
+            for date2w in dtlist2w:
+                dtlist += self.string_write(date2w.strftime("%Y%m%d").upper())+COMMA
+        return  dtlist[:-1] #remove the last character as it is a trailing COMMA 
     def datelist_load(self,sDatelist,passedparam="",LineNumber = 0):
 #        if sDatelist.find(",")>=0:
         sDatelist=sDatelist.split(",")
@@ -618,6 +638,7 @@ class iCalendar:
     lSCM=[]
     dSCM={}
     LogData = ""
+    logger = None
     def inf(self):
         """ Returns generic info """
         info = "Follows:\n"
@@ -646,6 +667,11 @@ class iCalendar:
     def debug(self,TrueFalse,LogPath="",debug_level=0):
         """ enables logging when executing (warning severe slow down)"""
         self.debug_mode = TrueFalse
+        if self.debug_mode:
+            if len(LogPath)>0:
+                logging.basicConfig(filename=LogPath,level=debug_level)
+            else:
+                logging.basicConfig(level=debug_level)
         self._log("self debug is now",[TrueFalse])
         self.debug_level = debug_level
         self.LogFilePath = LogPath
@@ -666,12 +692,23 @@ class iCalendar:
                     else:
                         line = line + "\t"+str(el)[0:1000]
                 line +="\n"
-                if len(self.LogFilePath)>0:
-                    log=open(self.LogFilePath,'a')
-                    log.write(line)
-                    log.close()
+                if level == logging.DEBUG:
+                    flog = logging.debug
+                elif level == logging.INFO:
+                    flog = logging.debug
+                elif level == logging.WARNING:
+                    flog = logging.warning
+                elif level == logging.ERROR:
+                    flog = logging.error
                 else:
-                    self.LogData += line
+                    flog = logging.critical
+                flog(line)
+#                 if len(self.LogFilePath)>0:
+#                     log=open(self.LogFilePath,'a')
+#                     log.write(line)
+#                     log.close()
+#                 else:
+#                     self.LogData += line
     def GenRRULEstr(self,rules):
         """ Generates RRULE string from rules dictionary
         
@@ -1184,10 +1221,11 @@ class iCalendar:
                 #remove from lisst_dates any date in exdates
                 #
                 #FIXME: below needs to be made robust on combination of date / date-time naive / date-time aware on both t_res and exdates
-                if not self._type_date(exdates[0])==self._type_date(t_res[0]):
-                    t_res = [self._from_FloatingTime2TZ(val, UTC) for val in t_res if self._from_FloatingTime2TZ(val, UTC) not in exdates]
-                else:
-                    t_res = [val for val in t_res if val not in exdates]
+                if len(t_res)>0: #added for 0.6.2a7
+                    if not self._type_date(exdates[0])==self._type_date(t_res[0]):
+                        t_res = [self._from_FloatingTime2TZ(val, UTC) for val in t_res if self._from_FloatingTime2TZ(val, UTC) not in exdates]
+                    else:
+                        t_res = [val for val in t_res if val not in exdates]
 
             
             res_slots = []
@@ -1727,7 +1765,11 @@ class iCalendar:
             for setpos in setposlist:
                 if setpos>0:
                     setpos = setpos-1
-                dates_pos.append(dates[setpos])
+                try:
+                    dates_pos.append(dates[setpos])
+                except:
+                    self._log("dates setpos", [dates,setpos], logging.CRITICAL)
+                    raise
             dates = dates_pos
         if len(list_dates)==0:
             list_dates = dates
@@ -1770,6 +1812,7 @@ class iCalendar:
         vevent_write = {
                         "TEXT": self.vevent.string_write,
                         "DATE-TIME": self.vevent.date_write,
+                        'DATE-TIME-LIST':self.vevent.datelist_write,
                         "INTEGER":self.vevent.integer_write,
                         "DURATION":self.vevent.duration_write,
                         "CAL-ADDRESS":self.vevent.cal_address_write,
@@ -1800,10 +1843,13 @@ class iCalendar:
         
         for event in self.events:
             if "UID" not in event:
-                event["UID"]="FIXMEUID"
+                event["UID"]=str(uuid.uuid1())+"@1-annum.com"
             if "DTSTAMP" not in event:
                 event["DTSTAMP"]={"param":"","val":datetime.now()}
             sCalendar += "BEGIN:VEVENT"+CRLF
+            if "DTSTART" not in event:
+                if "RDATE" in event:
+                    event["DTSTART"]={"param":"","val":event["RDATE"][0]}
             for Prop in event:
                 if not "val" in event[Prop]:
                     propvalue = event[Prop]
