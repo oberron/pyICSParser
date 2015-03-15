@@ -10,7 +10,7 @@ Created on Jan 6, 2012
 # from distutils.core import setup
 from setuptools import setup
 
-PackageVersion = "0.6.2a11"
+PackageVersion = "0.6.2a12"
 
 setup(
     name = 'pyICSParser',
@@ -21,7 +21,7 @@ setup(
     
     
     url = 'http://ical2list.appspot.com',
-    download_url = "https://pypi.python.org/packages/source/p/pyICSParser/pyICSParser-%s.tar.gz"%(PackageVersion),
+#     download_url = "https://pypi.python.org/packages/source/p/pyICSParser/pyICSParser-%s.tar.gz"%(PackageVersion),
     license = 'LICENSE.txt',
     keywords = 'iCalendar ical ics parser validator generator events enumerator rfc5545 rfc2445 vcal',
     description='Module supporting the iCalendar specification as defined in RFC5545 as well as its predecessor RFC2445 and non-standard deviances from iCal (Apple), Outlook-calendar (Microsoft), ... ',
