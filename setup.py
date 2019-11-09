@@ -10,7 +10,7 @@ Created on Jan 6, 2012
 # from distutils.core import setup
 from setuptools import setup
 
-PackageVersion = "0.6a13"
+PackageVersion = "0.7.1a1"
 
 setup(
     name = 'pyICSParser',
@@ -46,10 +46,8 @@ setup(
                 'Intended Audience :: End Users/Desktop',
                 'Intended Audience :: Developers',
                 'Operating System :: OS Independent',
-                'Programming Language :: Python :: 2.4',
-                'Programming Language :: Python :: 2.5',
-                'Programming Language :: Python :: 2.6',
                 'Programming Language :: Python :: 2.7',
+                'Programming Language :: Python :: 3.7',
                 "Topic :: Utilities",
     ],
 )

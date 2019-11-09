@@ -1,1 +1,2 @@
 0.0.73a, 2012-01-22, first release
+0.7.1a1: minor modification to support python 3

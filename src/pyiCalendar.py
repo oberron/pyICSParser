@@ -36,7 +36,7 @@ Usage
     listDates = [datetime.datetime(2014,8,1),datetime.datetime(2014,9,9),datetime.datetime(2014,10,8)] \n
     calGen.events=[{"DESCRIPTION":"pyICSParser Generator test event","RDATE":listDates}] \n
     sICalendar = calGen.Gen_iCalendar() \n
-    print sICalendar \n
+    print(sICalendar) \n
 
 
 To come
@@ -86,13 +86,14 @@ Created on Aug 4, 2011
 """
 
 from datetime import tzinfo, timedelta, datetime, date
-
-from icalendar_SCM import RFC5545_SCM, ESCAPEDCHAR,COMMA,RFC5545_Properties,RFC5545_FREQ,weekday_map,MaxInteger, CRLF,RFC5545_eventprop_count
-from RFC5546_SCM import RFC5546_METHODS
 import uuid
 import logging
 
-__VERSION__ = "0.6.2a8"
+from icalendar_SCM import RFC5545_SCM, ESCAPEDCHAR,COMMA,RFC5545_Properties,RFC5545_FREQ,\
+    weekday_map,MaxInteger, CRLF,RFC5545_eventprop_count, VCALENDAR_Components, VCALENDAR_Properties
+from RFC5546_SCM import RFC5546_METHODS
+
+__VERSION__ = "0.7.1a1"
 
 class newTZinfo(tzinfo):
     
@@ -119,28 +120,43 @@ class vevent:
     conformance = False
 #    vevent_load = { "uid": self.string_load}
     def Validator(self,RFC_SCM,line_count=0,line="",level=0, alttxt = "", show = False):
+        """ Displays the error message either from RFC_SCM or alttxt for error found at line
+        Parameters:
+        -----------
+        RFC_SCM:
+        line_count: int, default =0
+            line number for the iCalendar file at which the error occurs - if 0 means missing from file
+        level: 
+        alttxt: str
+            string to be displayed instead of RFC_SCM lookup
+        show: bool
+            if False do not show the error
+            if True display the error
+        Return:
+        -------
+        None
+        """
         #FIXME: need to have one Validator for both event and calendar
 
-#        print "line 111: dSCM, RFC_SCM",self.dSCM,RFC_SCM
         if not RFC_SCM=="3_0":
             self.lSCM.append(RFC_SCM)
             if line_count in self.dSCM:
                 self.dSCM[line_count].append(RFC_SCM)
             else:
-    #            print line_count
                 self.dSCM[line_count]=[RFC_SCM]
 
 
         if show or self.conformance:
             if level ==0:
                 if line_count==0 and line =="" and alttxt != "":
-                    print "Warning: RFC5545 specifies \'%s\', %s"%(RFC5545_SCM[RFC_SCM],alttxt)
+                    print("Warning: RFC5545 specifies \'%s\', %s"%(RFC5545_SCM[RFC_SCM],alttxt))
                 else:
-                    print "Warning: RFC5545 specifies \'%s\', following line is not compliant \n line: %s - %s"%(RFC5545_SCM[RFC_SCM],str(line_count),line)
+                    print("Warning: RFC5545 specifies \'%s\', following line is not compliant \n line:\
+                         %s - %s"%(RFC5545_SCM[RFC_SCM],str(line_count),line))
             if level ==1:
                 raise Exception("RFC5545 non compliance","RFC5545 specifies: \'%s\', following line is not compliant \n line: %s - %s"%(RFC5545_SCM[RFC_SCM],str(line_count),line))
             elif level ==-1:
-                print alttxt
+                print(alttxt)
                 
     def _icalindex_to_pythonindex(self,indexes):
         #FIXME: change this to load_integerlist and add check that we have "," as list separator (and no other values)
@@ -711,7 +727,6 @@ class iCalendar:
 #                     self.LogData += line
     def GenRRULEstr(self,rules):
         """ Generates RRULE string from rules dictionary
-        
         Used by generator. 
         """
         
@@ -736,31 +751,39 @@ class iCalendar:
             RRULE = RRULE[:-1]
         return RRULE
     def Validator(self,RFC_SCM,line_count=0,line="",level=0, alttxt = "", show = False):
-        """ when set for conformance logging (self.conformance == True) will display and log non-conformance """
+        """ when set for conformance logging (self.conformance == True) will display and log non-conformance\
+        Parameters:
+        ------------
+        Returns:
+        ---------
+        Usage:
+        ------
+        """
         
-#        print "line 695: dSCM, RFC_SCM",self.dSCM,RFC_SCM
         if not RFC_SCM=="3_0":
             self.lSCM.append(RFC_SCM)
             if line_count in self.dSCM:
                 self.dSCM[line_count].append(RFC_SCM)
             else:
-    #            print line_count
                 self.dSCM[line_count]=[RFC_SCM]
-#        print "line 703:",self.dSCM
 
         if show or self.conformance:
             if level ==0:
                 if line_count==0 and line =="" and alttxt != "":
-                    print "Warning: RFC5545 specifies \'%s\', %s"%(RFC5545_SCM[RFC_SCM],alttxt)
+                    msg_txt = "Warning: RFC5545 specifies \'%s\', %s"%(RFC5545_SCM[RFC_SCM],alttxt)
+                    logging.warning(msg_txt)
                 else:
-                    print "Warning: RFC5545 specifies \'%s\', following line is not compliant \n line: %s - %s"%(RFC5545_SCM[RFC_SCM],str(line_count),line)
+                    msg_txt = "Warning: RFC5545 specifies \'%s\', following line is not compliant \n line:\
+                         %s - %s"%(RFC5545_SCM[RFC_SCM],str(line_count),line)
+                    logging.warning(msg_txt)
             if level ==1:
-                raise Exception("RFC5545 non compliance","RFC5545 specifies: \'%s\', following line is not compliant \n line: %s - %s"%(RFC5545_SCM[RFC_SCM],str(line_count),line))
+                msg_txt = "RFC5545 non compliance","RFC5545 specifies: \'%s\', following line is not compliant \n line:\
+                     %s - %s"%(RFC5545_SCM[RFC_SCM],str(line_count),line)
+                raise Exception(msg_txt)
             elif level ==-1:
-                print alttxt
+                print(alttxt)
     def local_load(self,sLocalFilePath,conformance=False):
         """loads iCalendar file from local path
-        
         conformance will force / or not checking ics file for conformance (not supported yet)
         """
         self.sVCALENDAR = []
@@ -775,7 +798,11 @@ class iCalendar:
         self.conformance = conformance
         self.vevent.conformance = conformance
         self._log("\t\t entering local load:",[sLocalFilePath])
-        self.Validator("3_0", alttxt="***********************************************************************************************\n*** \t\t Validating file: %s\t\t ***\n***\t\t with module version %s \t\t\t\t\t****\n***********************************************************************************************"%(sLocalFilePath,self.version),level = -1)
+        self.Validator("3_0", \
+            alttxt="***********************************************************************************************\n*** \
+                \t\t Validating file: %s\t\t ***\n***\t\t with module version %s \t\t\t\t\t\
+                ****\n***********************************************************************************************"\
+                    %(sLocalFilePath,self.version),level = -1)
 
 #        self.local_path = path
         #here check local path
@@ -810,7 +837,6 @@ class iCalendar:
         for line in strings:
             self._log("current sVCALENDAR, new line:", [self.sVCALENDAR,line], 0)
             line_count +=1
-#            print "\t\t %s line:%s"%(line_count ,line)
 
             if len(line)>1:
                 if line[-2:-1] == "\n\r":
@@ -867,23 +893,19 @@ class iCalendar:
 
     def parse_loaded(self):
         """ parse loaded ical from file to array of typed data: self.events"""
-        VCALENDAR_Components = {"VEVENT","VTIMEZONE","VTODO","VFREEBUSY","VJOURNAL"}
-        Component_Name = ""
+        # the current Component_Name
+        Component_Name = "" #str
         Component_Stack =[]
-#         print "temp 835 - entering parse loaded"
-#         import sys,traceback
-#         for thread, frame in sys._current_frames().items():
-#             print('Thread 0x%x' % thread)
-#             traceback.print_stack(frame)
 
         self._log("\t\tentering loader",[])
-        invevent = 0
+        #invevent: 0 if not in vevent component, 1 if init
+        invevent = 0 #int
+        #inothercomp: True if vcalendar componnet other than vevent
+        inothercomp = False #bool
         LineCountBE = 0 #Line count at which the Begin:VEVENT was found
         if self.ical_loaded == 0:
             self._log("error ",[RFC5545_SCM["3_1"]])
             self.Validator("3_1", level=1) #("VCALENDAR VALIDATOR","no vCALENDAR loaded")
-#            self.ical_error = 1
-#            return 0
         elif self.ical_loaded == 1:
             #TODO: add here increments over the calendars
             self._log("ical loaded", [self.ical_loaded,self.sVCALENDAR],0)
@@ -891,8 +913,7 @@ class iCalendar:
             for line in self.sVCALENDAR:
                 self._log("line is ", [line], 0)
                 line_count +=1
-                #first load the given event
-#                pos = line.find("BEGIN:")
+                #CALENDAR line either cal prop, begin component, end component or component properties
                 if (line.find("BEGIN:")==0):
                     self._log("new component?: LN / line / name",[line_count,line])
                     new_Component_Name= self._propval_line_split(line.replace("\n",""),line_count)[2] # ":".join(line.split(":")[1:]).replace("\n","")
@@ -900,10 +921,13 @@ class iCalendar:
                         self._log("found new component: LN / line / name",[line_count,line,new_Component_Name])
                         Component_Stack.append(Component_Name)
                         Component_Name = new_Component_Name 
-                        if (invevent == 0):
+                        if (invevent == 0) and (not inothercomp) and (Component_Name=="VEVENT"):
                             invevent = 1
                             self.lVEVENT =[]
                             LineCountBE = line_count
+                        elif (invevent == 0) and (not inothercomp) and (Component_Name!="VEVENT"):
+                            inothercomp = True
+                            self.lCOMPONENT = []
                         else:
                             self.Validator("3.6.1_1", line_count = line_count, line = line, level = 1) #raise Exception("VCALENDAR VALIDATOR","encountered BEGIN:%s before END:VEVENT @line: %s"%(Component_Name,str(line_count)))
 #                            self.ical_error = 1
@@ -913,14 +937,14 @@ class iCalendar:
 #                pos = line.find("END:")
                 elif (line.find("END:")==0):
                     self._log("new end?: LN / line ",[line_count,line])
-                    #if we have a event closing tag
+                    #if we have a event closing tag, check it matches the opening tag
                     closing_Component = self._propval_line_split(line.replace("\n",""),line_count)[2]#":".join(line.split(":")[1:]).replace("\n","") 
                     self._log("found end component: LN / line / name",[line_count,line,closing_Component ])
                     if closing_Component == Component_Name :
+                        #closing tag matches opening one
                         if invevent ==1:
                             #if we were already adding an event - stop adding
                             invevent = 0
-#                            self.lVEVENT = self.lVEVENT+ [line.replace("\n","")]
                             self._log("event is", self.lVEVENT,2)
                             if Component_Name == "VEVENT":
                                 self._addEvent(self.lVEVENT,LineCountBE)
@@ -928,6 +952,10 @@ class iCalendar:
                             elif Component_Name == "VTIMEZONE":
                                 #FIXME: add the function pointer here
                                 pass
+                        elif inothercomp:
+                            #FIXME: add code here to add comp properties to structure
+                            inothercomp=False
+                            pass
                     elif closing_Component in VCALENDAR_Components:
 #                        self.ical_error = 1
                         self.Validator("3.6.1_1", line_count = line_count, line = line, level = 1,show=True) #raise Exception("VCALENDAR VALIDATOR","encountered END:%s instead of END:%s @line: %s"%(closing_Component,Component_Name,str(line_count)))
@@ -936,15 +964,21 @@ class iCalendar:
 #                        raise Exception("IANA or X-PROPERTY","Not supported yet")
                         pass
                 else:
-                    if (invevent ==1):
+                    #neither BEGIN or END calendar component
+                    if (invevent ==1) and (not inothercomp):
+                        #then if we are in VEVENT
                         self.lVEVENT = self.lVEVENT + [line]
+                    elif inothercomp:
+                        #or if we are in cal COMPONENT
+                        self.lCOMPONENT += [line]
                     else:
-                        #here adding the calendar  properties
+                        #otherwise assume we are adding the calendar  properties
                         [prop,param, val] = self._propval_line_split(line,line_count)
                         self.dVCALENDAR[prop]={"param":param,"val":val}
-            
-            if Component_Name == "":
-                self.Validator("3.6_3")
+                        if Component_Name == "" and (not prop in VCALENDAR_Properties):
+                            #if we are not in a component and the line is not a VCALENDAR Properties
+                            self.Validator("3.6_3", line_count = line_count)
+
         if "PRODID" not in self.dVCALENDAR:
             self.Validator("3.6_1",alttxt = "Parsed all calendar and was not found")
         if "VERSION" not in self.dVCALENDAR:
@@ -1035,11 +1069,6 @@ class iCalendar:
             ret_val=ret_val[:-1]
         return ret_val
     def _flatten(self,slot_dur=timedelta(days=1)):
-#        print "entering flatten"
-#        import sys,traceback
-#        for thread, frame in sys._current_frames().items():
-#            print('Thread 0x%x' % thread)
-#            traceback.print_stack(frame)
         """ goes over self.events and compute list of their instances"""
         self._log("******************\t\t\t entering _flatten",[])
         self.events_instances = []
@@ -1680,9 +1709,15 @@ class iCalendar:
             CW = 0
         return CW
     def _get_number_slots(self,dtstart,dtend,slot_duration):
-        """ will return the number of slots (defined by slot duration) between dtstart (inclusive) and dtend (not inclusive)
-        
+        """ will return the number of slots (defined by slot duration) between dtstart (inclusive) 
+        and dtend (not inclusive)
         handles timezones and leap seconds
+        Parameters:
+        -----------
+        Returns:
+        --------
+        nb_slots: int
+            count of slots
         """
         delta = dtend-dtstart
         delta_days = delta.days
@@ -1690,7 +1725,7 @@ class iCalendar:
         delta_seconds = delta_days *86400
         delta_seconds = delta_seconds+delta.seconds
         slot_dur_seconds = slot_duration.days*86400 + slot_duration.seconds
-        nb_slots = delta_seconds/slot_dur_seconds
+        nb_slots = int(delta_seconds/slot_dur_seconds)
         return nb_slots
     def _to_FloatingTime(self,dt):
         """ takes a datetime object with tzinfo and returns a naive datetime with time converted to UTC """
@@ -1793,13 +1828,7 @@ class iCalendar:
         try:
             self.events_instances = sorted(self.events_instances,key = lambda dateeve: operator.itemgetter(0).date() if type(operator.itemgetter(0)) == type(datetime.now()) else operator.itemgetter(0) )
         except:
-            print self.events_instances
-#            print self.events_instances[0][0]
-#            print type(self.events_instances[0][0])
-#            print datetime(2015,1,1,11,11)
-#            print datetime(2015,1,1,11,11).date()
-#            print datetime(2015,1,1,11,11).date().date()
-#            print self.events_instances[0][0].date()
+            print(self.events_instances)
             raise
         return self.events_instances
 
@@ -1864,7 +1893,9 @@ class iCalendar:
                     #write code here for adding X-properties
                     pass
                 else:
-                    print "trying to add invalid property: %s"%(Prop)
+                    msg_txt = "trying to add invalid property: %s"%(Prop)
+                    print(msg_txt)
+                    logging.warning(msg_txt)
                 sCalendar+= self.vevent.line_wrap(newline)
                 newline =""
             sCalendar += "END:VEVENT"+CRLF
@@ -1888,11 +1919,9 @@ class iCalendar:
         retval = False
         self.parse_loaded()
         if len(self.lSCM)==0 and len(self.vevent.lSCM)==0:
-#            print "Congratulations your iCalendar file is 100% compliant to RFC5545"
             retval = True
         else:
             pass
-#            self.dSCM = sorted(self.dSCM)
         return retval
     def isCalendarStringCompliant(self,iCalendarFile,_ReportNonConformance = True):
         """ will load and parse the iCalendar File and display errors """
@@ -1904,10 +1933,60 @@ class iCalendar:
         retval = False
         self.parse_loaded()
         if len(self.lSCM)==0 and len(self.vevent.lSCM)==0:
-#            print "Congratulations your iCalendar file is 100% compliant to RFC5545"
+#            "Congratulations your iCalendar file is 100% compliant to RFC5545"
             retval = True
         else:
             pass
 #            self.dSCM = sorted(self.dSCM)
 
         return retval
+
+if __name__=="__main__":
+    #no need to import when module is called by external code
+    #so importing argparse here
+    import argparse
+    from os.path import abspath, join, pardir, isfile
+    parser = argparse.ArgumentParser(description='Parsing iCalendar files as per RFC5545')
+    parser.add_argument('--env',"-e", dest='enum_non_validate', type=str,default=False,
+                    help='if True (True,true,y,Y,yes,Yes,1) enumerates (requires dtstart/dtend), if False validates calendar file')
+    parser.add_argument('--ical',"-i", dest='iCalendar', type=str,default="simple_rrule_typo.ics",
+                    help='abspath to iCalendar file, file path will be looked first in ../ics then . \
+                        then tries absolute path')
+    parser.add_argument('--dtsart',"-s", dest='dtstart', type=str,default="20190101",
+                help='start date for calendar')
+    parser.add_argument('--dtend',"-n", dest='dtend', type=str,default="20191231",
+                help='end date for calendar')
+
+    args = vars(parser.parse_args())
+    print(args["enum_non_validate"][:1])
+    args["enum_non_validate"]= True if args["enum_non_validate"][:1].lower() in ["t","y","1"] else False
+
+    #ASSESS if iCalendar file can be found and keep the absolute path for the parser
+    if isfile(abspath(join(__file__,pardir,pardir,"ics",args["iCalendar"]))):
+        ics_fp = abspath(join(__file__,pardir,pardir,"ics",args["iCalendar"]))
+    elif isfile(abspath(join(__file__,pardir,args("iCalendar")))):
+        ics_fp = abspath(join(__file__,pardir,"ics",args["iCalendar"]))
+    elif isfile(args["iCalendar"]):
+        ics_fp=args["iCalendar"]
+    else:
+        raise Exception("iCalendar file could not be found: %s"%(args["iCalendar"]))
+
+    #create the Parser
+    mycal = iCalendar()
+
+
+    #if we try to enumerate:
+    if args["enum_non_validate"]:
+        print("parsing iCalendar file for instance dates")
+        mycal.local_load(ics_fp)
+        dates = mycal.get_event_instances(args["dtstart"],args["dtend"])
+        if dates:
+            print("dates found: %s"%(dates))
+        else:
+            print("no dates found")
+    else:
+        #if we selected the validator
+        print("parsing iCalendar file for compliance")
+        mycal.isCalendarFileCompliant(ics_fp)
+
+    print("done")

@@ -37,6 +37,8 @@ Versions
 	
 	-0.6.x: added support for DURATION and when DTEND no present
 	
+	-0.7.x: added support for python 3
+
 Future developments
 --------------------
 1. handle of datetime (currently only handles date)
