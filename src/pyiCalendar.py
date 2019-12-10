@@ -1449,7 +1449,8 @@ class iCalendar:
             self._log("years months weeks days",[years,months,weeks,days,event_start,event_end])
             self._log("checks are: dow, week,doy,setpos",[check_dow,check_week,check_doy,check_setpos])
             if month_step_size > 12:
-                years = self._mklist(event_start.year, event_end.year,month_step_size/12+1)
+                #PY3 update below
+                years = self._mklist(event_start.year, event_end.year,int(month_step_size/12)+1)
             else:
                 years = self._mklist(event_start.year, event_end.year,year_step_size)
             self._log("years months weeks days",[years,months,weeks,days,event_start,event_end])
@@ -1824,9 +1825,11 @@ class iCalendar:
         self.OccurencesWindowEndDate = datetime.strptime(end,"%Y%m%d")+timedelta(days =1)
         self.parse_loaded()
         self._flatten()
-        import operator
         try:
-            self.events_instances = sorted(self.events_instances,key = lambda dateeve: operator.itemgetter(0).date() if type(operator.itemgetter(0)) == type(datetime.now()) else operator.itemgetter(0) )
+            #PY3 update below
+            self.events_instances = sorted(self.events_instances,\
+                key = lambda recur_instance: recur_instance[0])
+                #key = lambda dateeve: operator.itemgetter(0).date() if type(operator.itemgetter(0)) == type(datetime.now()) else operator.itemgetter(0) )
         except:
             print(self.events_instances)
             raise
