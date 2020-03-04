@@ -91,9 +91,9 @@ import logging
 
 from .icalendar_SCM import RFC5545_SCM, ESCAPEDCHAR,COMMA,RFC5545_Properties,RFC5545_FREQ,\
     weekday_map,MaxInteger, CRLF,RFC5545_eventprop_count, VCALENDAR_Components, VCALENDAR_Properties
-from RFC5546_SCM import RFC5546_METHODS
+from .RFC5546_SCM import RFC5546_METHODS
 
-__VERSION__ = "0.7.1a1"
+__VERSION__ = "0.7.1a3"
 
 class newTZinfo(tzinfo):
     

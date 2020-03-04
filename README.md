@@ -44,6 +44,10 @@ Future developments
 1. handle of datetime (currently only handles date)
 2. handle of multiple EXRULE,  RRULE as per icalendar spec
 
+Development and Installation
+----------------------------
+
+
 Thanks
 -------
 * http://www.tele3.cz/jbar/rest/rest.html: reST to HTML & reST validator

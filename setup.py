@@ -10,7 +10,7 @@ Created on Jan 6, 2012
 # from distutils.core import setup
 from setuptools import setup
 
-PackageVersion = "0.7.1a1"
+PackageVersion = "0.7.1a3"
 
 setup(
     name = 'pyICSParser',
