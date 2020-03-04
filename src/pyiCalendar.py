@@ -89,7 +89,7 @@ from datetime import tzinfo, timedelta, datetime, date
 import uuid
 import logging
 
-from icalendar_SCM import RFC5545_SCM, ESCAPEDCHAR,COMMA,RFC5545_Properties,RFC5545_FREQ,\
+from .icalendar_SCM import RFC5545_SCM, ESCAPEDCHAR,COMMA,RFC5545_Properties,RFC5545_FREQ,\
     weekday_map,MaxInteger, CRLF,RFC5545_eventprop_count, VCALENDAR_Components, VCALENDAR_Properties
 from RFC5546_SCM import RFC5546_METHODS
 
