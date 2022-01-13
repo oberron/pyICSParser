@@ -37,7 +37,12 @@ Versions
 	
 	-0.6.x: added support for DURATION and when DTEND no present
 	
-	-0.7.x: added support for python 3
+	-0.7.x: added support for python 3; 9/10 cottage cheese with pyroma
+
+## Release Flow
+
+* run unit test
+* run pyroma
 
 Future developments
 --------------------
