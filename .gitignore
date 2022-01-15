@@ -9,6 +9,8 @@ include
 out/
 .venv
 venv
+dist/
+pyICSParser.egg-info/
 pip-selfcheck.json
 # Mac OS X custom attribute files
 .DS_Store
