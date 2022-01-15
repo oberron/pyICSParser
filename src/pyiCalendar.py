@@ -71,13 +71,16 @@ Next:
 
 History
 -------
-* 0.6.1y - Jan 2013: added support for no dtstart and/or not dtend (compute one from another and raise exception if neither present) + add support for RDATE after UNTIL (and RDATE before DTSTART (to be ignored)
+* 0.6.1y - Jan 2013: added support for no dtstart and/or not dtend (compute one from another and 
+                    raise exception if neither present) 
+                    + add support for RDATE after UNTIL (and RDATE before DTSTART (to be ignored)
 Created on Aug 4, 2011
 * 0.6.1y1 - Feb 2013: added support for date-time, date-time-floating, date-time-TZID (though instances still only reports date) and no VTIMEZONE handling
 * 0.6.1y3 - ValidateiCalendar will report and return True if iCalendar file is 100% compliant
 *0.6.1y4 - fixed the validator not catching the max component count (see RFC5545_eventprop_count) 
             fixed the parser making difference between properties based on casing (lower / upper / mix)
 *0.6.2a8 - fixed issues with the generator (no UID) + added support for Generator with RDATE (added datelist_write)
+* 0.7.2: py3 branch + added utf-8 encoding when opening .ics files + fix #10
 @author: oberron
 @change: to 0.4 - passes all unit test in ical_test v0.1
 @change: 0.4 to 0.5 adds EXDATE support
@@ -93,7 +96,7 @@ from icalendar_SCM import RFC5545_SCM, ESCAPEDCHAR,COMMA,RFC5545_Properties,RFC5
     weekday_map,MaxInteger, CRLF,RFC5545_eventprop_count, VCALENDAR_Components, VCALENDAR_Properties
 from RFC5546_SCM import RFC5546_METHODS
 
-__VERSION__ = "0.7.1a1"
+__VERSION__ = "0.7.2"
 
 class newTZinfo(tzinfo):
     
@@ -220,8 +223,12 @@ class vevent:
         return datestring
     def date_load(self,propval,params=[],LineNumber = 0):
         """ loads the date-time or date value + optional TZID into UTC date-time or date
-        
-        DTSTART, DTEND, DTSTAMP, UNTIL,..."""
+            used for : DTSTART, DTEND, DTSTAMP, UNTIL,...
+        Parameters:
+        -----------
+        Returns:
+        --------    
+        """
         TZID="TZID not set - floatting"
         newdate = None
         
@@ -270,7 +277,8 @@ class vevent:
                 else:
                     newdate = retdate
             elif len(propval)==8:
-                #here is the case where we load UNTIL and it is a 'DATE' but we cannot check yet against the DTSTART value type
+                # here is the case where we load UNTIL and 
+                # it is a 'DATE' but we cannot check yet against the DTSTART value type
                 newdate = datetime.strptime(propval[0:8],"%Y%m%d").date()
             else:
                 self.Validator("3.3.5_2", LineNumber, line = propval)
@@ -806,7 +814,7 @@ class iCalendar:
 
 #        self.local_path = path
         #here check local path
-        string = open(sLocalFilePath,'r').readlines()
+        string = open(sLocalFilePath,'r',encoding="utf-8").readlines()
         #FIXME: add here the CRLF check and remove the \n from strings_load
         #RFC5545_SCM["3.1_1"]
         self.strings_load(string,conformance)
@@ -1449,7 +1457,8 @@ class iCalendar:
             self._log("years months weeks days",[years,months,weeks,days,event_start,event_end])
             self._log("checks are: dow, week,doy,setpos",[check_dow,check_week,check_doy,check_setpos])
             if month_step_size > 12:
-                years = self._mklist(event_start.year, event_end.year,month_step_size/12+1)
+                #PY3 update below
+                years = self._mklist(event_start.year, event_end.year,int(month_step_size/12)+1)
             else:
                 years = self._mklist(event_start.year, event_end.year,year_step_size)
             self._log("years months weeks days",[years,months,weeks,days,event_start,event_end])
@@ -1824,9 +1833,11 @@ class iCalendar:
         self.OccurencesWindowEndDate = datetime.strptime(end,"%Y%m%d")+timedelta(days =1)
         self.parse_loaded()
         self._flatten()
-        import operator
         try:
-            self.events_instances = sorted(self.events_instances,key = lambda dateeve: operator.itemgetter(0).date() if type(operator.itemgetter(0)) == type(datetime.now()) else operator.itemgetter(0) )
+            #PY3 update below
+            self.events_instances = sorted(self.events_instances,\
+                key = lambda recur_instance: recur_instance[0])
+                #key = lambda dateeve: operator.itemgetter(0).date() if type(operator.itemgetter(0)) == type(datetime.now()) else operator.itemgetter(0) )
         except:
             print(self.events_instances)
             raise

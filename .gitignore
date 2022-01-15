@@ -12,3 +12,5 @@ venv
 pip-selfcheck.json
 # Mac OS X custom attribute files
 .DS_Store
+# VS Code
+.vscode
