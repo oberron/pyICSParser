@@ -50,7 +50,14 @@ python test.py
 ```
 cd pyICSParser
 pyroma .
-```    
+```
+
+3. build and upload
+
+```
+py -m build
+py -m twine upload --repository pypi dist/*
+```
 
 ## Future developments
 
