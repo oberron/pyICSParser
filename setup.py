@@ -12,7 +12,7 @@ from setuptools import find_packages, setup
 from glob import glob
 with open("README.md", "r", encoding="utf-8") as fi:
     long_description = fi.read()
-PackageVersion = "0.7.2"
+PackageVersion = "0.7.2a2"
 setup(
     name = 'pyICSParser',
     version = PackageVersion,
