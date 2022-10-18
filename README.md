@@ -35,6 +35,7 @@ dates = mycal.get_event_instances(dtstart,dtend)
 	* 0.5.x: added support for EXDATE
 	* 0.6.x: added support for DURATION and when DTEND no present
 	* 0.7.x: added support for python 3; 9/10 cottage cheese with pyroma
+    * 0.7.3: fixing issue #12
 
 ## Release Flow
 
