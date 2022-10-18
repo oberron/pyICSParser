@@ -1785,6 +1785,7 @@ class iCalendar:
     def _sublist(self,lday,dates,summary,dow,check_setpos,setposlist,list_dates):
         """ used in flatten rrule to accelerate by only looking at some dates within a list"""
         self._log("347 list_Dates",[list_dates])
+        # print("debug #1",[list_dates])
         self._log("348 lday",[lday])
         self._log("349 setposlist",[setposlist])
         self._log("350 dow",[dow])
@@ -1810,8 +1811,14 @@ class iCalendar:
                 if setpos>0:
                     setpos = setpos-1
                 try:
-                    dates_pos.append(dates[setpos])
+                    #fix #1
+                    #initial logic error was to assume that setpost is <= the number of instances
+                    #adding logic to address the case where setpos > number of instances
+                    if setpos<=len(dates)-1:
+                        dates_pos.append(dates[setpos])
                 except:
+                    #issue#1 debug
+                    print("issue #1 debug",dates,len(dates),setpos)
                     self._log("dates setpos", [dates,setpos], logging.CRITICAL)
                     raise
             dates = dates_pos
@@ -1839,7 +1846,7 @@ class iCalendar:
                 key = lambda recur_instance: recur_instance[0])
                 #key = lambda dateeve: operator.itemgetter(0).date() if type(operator.itemgetter(0)) == type(datetime.now()) else operator.itemgetter(0) )
         except:
-            print(self.events_instances)
+            print(len(self.events_instances))
             raise
         return self.events_instances
 
