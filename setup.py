@@ -10,9 +10,12 @@ Created on Jan 6, 2012
 # from distutils.core import setup
 from setuptools import find_packages, setup
 from glob import glob
-with open("README.md", "r", encoding="utf-8") as fi:
+from os.path import abspath, join, pardir
+
+fp_readme = abspath(join(__file__,pardir,"README.md"))
+with open(fp_readme, "r", encoding="utf-8") as fi:
     long_description = fi.read()
-PackageVersion = "0.7.2a2"
+PackageVersion = "0.7.4"
 setup(
     name = 'pyICSParser',
     version = PackageVersion,
@@ -21,8 +24,6 @@ setup(
     description='Module supporting the iCalendar specification as defined in RFC5545 as well as its predecessor RFC2445 and non-standard deviances from iCal (Apple), Outlook-calendar (Microsoft), ... ',
     long_description=long_description,
     long_description_content_type="text/markdown",
-
-    
     
     url = 'http://ical2list.appspot.com',
     project_urls={
@@ -33,7 +34,7 @@ setup(
     keywords = 'iCalendar ical ics parser validator generator events enumerator rfc5545 rfc2445 vcal',
     
     packages=['pyICSParser'],
-    package_dir={'pyICSParser':"./src"},
+    package_dir={'pyICSParser':abspath(join(__file__,pardir,"src"))},
     classifiers=[
                 "Development Status :: 3 - Alpha",
                 "Topic :: Utilities",
