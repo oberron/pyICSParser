@@ -81,6 +81,7 @@ Created on Aug 4, 2011
             fixed the parser making difference between properties based on casing (lower / upper / mix)
 *0.6.2a8 - fixed issues with the generator (no UID) + added support for Generator with RDATE (added datelist_write)
 * 0.7.2: py3 branch + added utf-8 encoding when opening .ics files + fix #10
+* 0.7.4: fix #12, #9, #7
 @author: oberron
 @change: to 0.4 - passes all unit test in ical_test v0.1
 @change: 0.4 to 0.5 adds EXDATE support
@@ -96,7 +97,7 @@ from .icalendar_SCM import RFC5545_SCM, ESCAPEDCHAR,COMMA,RFC5545_Properties,RFC
     weekday_map,MaxInteger, CRLF,RFC5545_eventprop_count, VCALENDAR_Components, VCALENDAR_Properties
 from .RFC5546_SCM import RFC5546_METHODS
 
-__VERSION__ = "0.7.2"
+__VERSION__ = "0.7.4"
 
 class newTZinfo(tzinfo):
     
@@ -584,7 +585,9 @@ class vevent:
         if "EXDATE" in event and "DTSTART" in event:
             for exdate in event["EXDATE"]:
                 if not type(exdate) == type (event["DTSTART"]):
-                    self.Validator("3.8.5.1_0", alttxt = "rdate value %s does not match DTSTART: %s"%(str(rdate),str(event["DTSTART"])))
+                    log_msg = "exdate value type %s does not match DTSTART: %s"%(str(exdate),str(event["DTSTART"]))
+                    print(log_msg)
+                    self.Validator("3.8.5.1_0", alttxt = log_msg)
 
         if "RRULE" in event and ("DTSTART" in event):
             if type(event["DTSTART"]) == type(date(2003,3,5)):
@@ -1196,16 +1199,40 @@ class iCalendar:
             else:
                 rdates = []
 
+            # issue 12 fix
             if "EXDATE" in tmp_event:
-                exdates = tmp_event["EXDATE"]["val"]
-                #convert EXDATES time to floatting
-                if type(exdates[0])==type(datetime(2013,2,6,10,28,0,tzinfo=UTC)):
-                    pass
-                if len(rdates)>0:
-                    rdates = [val for val in rdates if val not in exdates]
-                    t_res = [val for val in t_res if val not in exdates]
+                exdates = []
+
+                # if we have multiple EXDATES properties
+                # https://datatracker.ietf.org/doc/html/rfc2445#section-4.6.1
+                # ; the following are optional,
+                # .../ exdate / exrule / rstatus / related /
+                # for RFC5545 exdate can only occur once
+                if isinstance(tmp_event["EXDATE"], list):
+                    for exdate in tmp_event["EXDATE"]: # added loop for multiple EXDATE on a single event
+                        exdates += exdate["val"] # added loop for multiple EXDATE on a single event
+                        # #convert EXDATES time to floatting
+                        if type(exdates[0])==type(datetime(2013,2,6,10,28,0,tzinfo=UTC)):
+                            pass
+                        if len(rdates)>0:
+                            rdates = [val for val in rdates if val not in exdates]
+                            t_res = [val for val in t_res if val not in exdates]
+                else:
+                    exdates = tmp_event["EXDATE"]["val"]
             else:
                 exdates = []
+
+            # replaced by issue 12 fix
+            # if "EXDATE" in tmp_event:
+            #     exdates = tmp_event["EXDATE"]["val"]
+            #     #convert EXDATES time to floatting
+            #     if type(exdates[0])==type(datetime(2013,2,6,10,28,0,tzinfo=UTC)):
+            #         pass
+            #     if len(rdates)>0:
+            #         rdates = [val for val in rdates if val not in exdates]
+            #         t_res = [val for val in t_res if val not in exdates]
+            # else:
+            #     exdates = []
             
             """ FIXME:
             If the duration of the recurring component is specified with the
