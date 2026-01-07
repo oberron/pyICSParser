@@ -580,7 +580,7 @@ class vevent:
         if "RDATE" in event and "DTSTART" in event:
             for rdate in event["RDATE"]:
                 if not type(rdate) == type (event["DTSTART"]):
-                    self.Validator("3.8.5.2_0", alttxt = "rdate value %s does not match DTSTART: %s"%(str(rdate),str(event["DTSTART"])))
+                    self.Validator("3.8.5.2_0", alttxt="rdate value %s does not match DTSTART: %s"%(str(rdate),str(event["DTSTART"])))
 
         if "EXDATE" in event and "DTSTART" in event:
             for exdate in event["EXDATE"]:
@@ -854,7 +854,7 @@ class iCalendar:
                     pass
                 else:
                     #FIXME: check why the local files are not conformant
-    #                self.Validator("VCALENDAR VALIDATOR: WARNING",RFC5545_SCM['3.1_1']+ "%s : %s"%(line_count,line),0)
+                    self.Validator("VCALENDAR VALIDATOR: WARNING",RFC5545_SCM['3.1_1']+ "%s : %s"%(line_count,line),0)
                     pass
                 if line[0]==" " and len(self.sVCALENDAR)>0:
                     self._log("line wrapper before",[line,self.sVCALENDAR])
@@ -1869,11 +1869,15 @@ class iCalendar:
         self._flatten()
         try:
             #PY3 update below
+            # ⚠️ Python cannot directly compare date and datetime.
+            # This will raise TypeError:
             self.events_instances = sorted(self.events_instances,\
-                key = lambda recur_instance: recur_instance[0])
+                key = lambda recur_instance: recur_instance[0] if isinstance(recur_instance[0], datetime) else datetime.combine(recur_instance[0], datetime.min.time()))
                 #key = lambda dateeve: operator.itemgetter(0).date() if type(operator.itemgetter(0)) == type(datetime.now()) else operator.itemgetter(0) )
-        except:
-            print(len(self.events_instances))
+        except Exception as ex:
+            for ei in self.events_instances:
+                print("ei:", ei)
+            print(len(self.events_instances), str(ex))
             raise
         return self.events_instances
 
