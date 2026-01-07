@@ -1,0 +1,25 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:1-annum
+METHOD:REQUEST
+BEGIN:VEVENT
+DTSTART;TZID="Eastern":20050411T100000
+DTEND;TZID="Eastern":20050411T120000
+RDATE;TZID="Eastern";VALUE=PERIOD:20050411T100000/20050411T110000
+ ,20050412T100000/20050412T110000,20050413T100000/20050413T110000
+ ,20050414T100000/20050414T110000,20050415T100000/20050415T110000
+DTSTAMP:20050406T202303Z
+DESCRIPTION;ALTREP="CID:<FFFE__=0ABBE548DFFC65378f9e8a93d@coffeebean.com>":
+SUMMARY:RFC5545 5.2
+DESCRIPTION:When the combination of the "RRULE" and "RDATE" properties in
+  a recurring component produces multiple instances having the same
+ start DATE-TIME value, they should be collapsed to, and
+ considered as, a single instance.  If the "RDATE" property is
+ specified as a PERIOD value the duration of the recurrence
+ instance will be the one specified by the "RDATE" property\, and
+ not the duration of the recurrence instance defined by the
+ "DTSTART" property.
+RRULE:FREQ=DAILY;COUNT=5
+UID:SCM5545_5.2_1@1-annum.com
+END:VEVENT
+END:VCALENDAR

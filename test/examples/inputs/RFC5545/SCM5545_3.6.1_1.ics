@@ -1,0 +1,15 @@
+BEGIN:VCALENDAR
+PRODID:1-annum
+VERSION:2.0
+BEGIN:VEVENT
+DTSTAMP:20130205T090000Z
+UID:SCM5545_3.6.1_1
+SUMMARY:SCM5545_3.6.1_1
+DTSTART:20130104T090000Z
+RRULE:FREQ=YEARLY;BYDAY=1MO;BYMONTH=2;INTERVAL=1;COUNT=11;
+DESCRIPTION:RFC5545 §3.6.1 The "DTSTART" property for a "VEVENT" specifies
+ the inclusive
+ start of the event.  For recurring events\, it also specifies the
+ very first instance in the recurrence set.
+END:VEVENT
+END:VCALENDAR

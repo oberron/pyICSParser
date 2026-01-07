@@ -1,0 +1,16 @@
+BEGIN:VCALENDAR
+PRODID:1-annum
+VERSION:2.0
+BEGIN:VEVENT
+UID:UID_1annum
+DTSTAMP:20110820T091426Z
+DTSTART;VALUE=DATE:20080229
+SUMMARY:29 fevrier
+DESCRIPTION:Lorem ipsum dolor sit amet\, consectetuer adip iscing elit. Pra
+ esent aliquet\, loremcon gue pharetra\, sapien massa pellentesque odio\, vit
+ ae dictum nisi nulla et urna. Crlaoreet. Sed ante libero\, scelerisque vel\,
+  euismod in\, dapibus et\, tortor. Morbi mollis\, risus vel porttitor commo 
+  do\, augue neque porta neque\, ut tristiquequ mturpis sit amet orci. Morbi
+   massa. Vestibulum nec augue.
+END:VEVENT
+END:VCALENDAR
